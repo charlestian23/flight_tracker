@@ -7,8 +7,10 @@ class Request:
     """
 
     def __init__(self, json_request):
+        # parse the cookie from the frontend request
         self.details = self.parse_cookie(json_request)
 
+        # assign values based on parsed details
         self.origin_type = self.details["departure_location_type"]
         self.origin_values = self.details["departure_location_values"]
 
@@ -27,6 +29,7 @@ class Request:
         self.is_cargo = self.details["cargo"]
         self.is_passenger = self.details["passenger"]
 
+        # create an AdvancedRequest object
         self.adv_req = AdvancedRequest(
             self.details["advanced_start_date"],
             self.details["advanced_start_time"],
@@ -42,14 +45,14 @@ class Request:
         Parameters:
             cookie: the cookie from the frontend
         """
+        # initialize an empty dictionary to store parsed cookie values
         to_return = {}
-        cookie = cookie.split("--")
+
+        # split the cookie into individual values and assign them to the dictionary
         to_return["departure_date"] = cookie[0]
         to_return["departure_time"] = cookie[1]
-
         to_return["arrival_date"] = cookie[2]
         to_return["arrival_time"] = cookie[3]
-
         to_return["day_of_week"] = {
             "7": cookie[4],
             "6": cookie[5],
@@ -59,31 +62,27 @@ class Request:
             "2": cookie[9],
             "1": cookie[10],
         }
-
         to_return["departure_location_type"] = cookie[11]
         to_return["departure_location_values"] = cookie[12].split("%2C")
-
         to_return["arrival_location_type"] = cookie[13]
         to_return["arrival_location_values"] = cookie[14].split("%2C")
-
         to_return["max_layovers"] = cookie[15]
-
         to_return["airlines"] = cookie[16].split("%2C")
-
         to_return["cargo"] = cookie[17]
         to_return["passenger"] = cookie[18]
-
         to_return["advanced_start_date"] = cookie[19]
         to_return["advanced_start_time"] = cookie[20]
-
         to_return["advanced_end_date"] = cookie[21]
         to_return["advanced_end_time"] = cookie[22]
-
         to_return["find_added"] = cookie[23]
         to_return["find_removed"] = cookie[24]
 
+        # print the parsed request for debugging purposes
         print("\n\nFrontend Request:\n", to_return)
+
+        # return the parsed details
         return to_return
+
 
 
 class AdvancedRequest:
@@ -92,14 +91,17 @@ class AdvancedRequest:
     """
 
     def __init__(self, start_date, start_time, end_date, end_time, added, removed):
+        # Store filter added and removed values
         self.filter_added = added
         self.filter_removed = removed
 
+        # If filter added is true, store the date and time range
         if self.filter_added == "true":
             self.start_date = start_date
             self.start_time = start_time
             self.end_date = end_date
             self.end_time = end_time
+        # If filter removed is true, store the date and time range
         elif self.filter_removed == "true":
             self.start_date = start_date
             self.start_time = start_time
@@ -112,12 +114,17 @@ class AdvancedRequest:
         Parameters:
             request_details: the details of the request
         """
+        # Store the value of filter added from request details
         self.filter_added = request_details["find_added"]
+        # If filter added is not empty, store the date and time range
         if self.filter_added:
             self.start = self.filter_added["start_info"]
             self.end = self.filter_added["end_info"]
 
+        # Store the value of filter removed from request details
         self.filter_removed = request_details["find_removed"]
+        # If filter removed is not empty, store the date and time range
         if self.filter_removed:
             self.start = self.filter_added["start_info"]
             self.end = self.filter_added["end_info"]
+
